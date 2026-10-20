@@ -1,56 +1,72 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
-        <ion-title>Blank</ion-title>
+        <ion-title> &#9925; Data Cuaca</ion-title>
       </ion-toolbar>
     </ion-header>
-
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <ion-content class="ion-padding">
+      <h2>Perkiraan Cuaca Di Jakarta</h2>
+      <div class="card">
+        <div v-for="(cuaca, i) in dataTampil" :key="i" class="data">
+          <p>Waktu: {{ cuaca.waktu }}</p>
+          <p>Suhu: {{ cuaca.suhu }} °C</p>
+        </div>
       </div>
+      <ion-button expand="block" @click="semua = !semua">{{ semua ? 'Tampilkan 10 Data' : 'Tampilkan Semua Data' }}</ion-button>
     </ion-content>
   </ion-page>
 </template>
-
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+  import{
+    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButton 
+  } from '@ionic/vue';
+  import{ ref, computed, onMounted} from 'vue';
+  import { ambilApi } from '../service/Api';
+
+  const dataCuaca = ref<any[]>([])
+  const semua = ref(false)
+  const dataTampil = computed(() => 
+  semua.value ? dataCuaca.value : dataCuaca.value.slice(0, 10))
+  
+  onMounted(async () => {
+    const data = await ambilApi()
+    dataCuaca.value = data.hourly.time.map((waktu: string, i: number) => ({
+      waktu,
+      suhu: data.hourly.temperature_2m[i]
+    }));
+  });
 </script>
 
 <style scoped>
-#container {
+ion-content{
+  --background: #f0f8ff;
+}
+ion-toolbar{
+  --background: #2196f3;
+  --color: white;
+}
+h2{
   text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  color: #1976d2;
 }
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.data{
+  padding: 15px 0;
+  border-bottom: 1px solid #ddd;
 }
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
+.data:last-child{
+  border-bottom: none;
 }
-
-#container a {
-  text-decoration: none;
+.data p{
+  margin-top: 0;
+  color: #555;
+}
+.data b {
+  color: #1976d2;
+}
+ion-button{
+  margin-top: 20px;
+  --background: #2196f3;
+  --color: white;
 }
 </style>
