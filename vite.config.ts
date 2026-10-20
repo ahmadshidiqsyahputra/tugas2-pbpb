@@ -7,6 +7,7 @@ import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/tugas2-pbpb/',
   plugins: [
     vue(),
     legacy()
